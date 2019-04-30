@@ -9,7 +9,8 @@
                 "${workspaceFolder}/Messager-Project.c",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}",
-                "${workspaceFolder}/message.c"
+                "${workspaceFolder}/message.c",
+                "${workspaceFolder}/server.c"
             ],
             "options": {
                 "cwd": "/usr/bin"

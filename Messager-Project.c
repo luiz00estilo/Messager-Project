@@ -1,20 +1,33 @@
 #include <stdio.h>
 #include "message.h"
+#include "server.h"
 
 int main(){
-    int i;
-    message msg[2];
-    msginit(&msg[0], 10);
-    msginit(&msg[1], 10);
-    while (1){
-    msgin(&msg[0]);
-    msgin(&msg[1]);
 
-    printf("%s\n%s\n%i\n\n", msg[0].text, msg[1].text, msgcomp(&msg[0], &msg[1]));
-    }
-    scanf("%i", &i);
+    int ret;
+	int tamMsg;
+	char msgEnv[TAM_MAX];
+	char msgRec[TAM_MAX];
+
+	/* Espera o cliente pedir para se conectar e se conecta */
+	ret	= conecta();
+	while (ret != -1){
+		
+		/* Lê uma mensagem do usuário e envia pela rede*/
+		printf("Digite a mensagem para enviar: ");
+		fgets(msgEnv, TAM_MAX, stdin);
+		tamMsg = strlen(msgEnv); 
+		
+		ret = enviaMensagem(msgEnv, tamMsg);
+		printf("Enviou uma mensagem com %d bytes\n", ret);
+
+
+		/* Recebe uma mensagem pela rede */
+		ret = recebeMensagem(msgRec, TAM_MAX);
+		printf("Msg recebida: %s \n", msgRec);
+	}
+
+	return 0;
     
-    msgend(&msg[0]);
-    msgend(&msg[1]);
     return 0;
 }
