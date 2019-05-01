@@ -1,35 +1,53 @@
 #include "message.h"
 
+#include <stdlib.h>
+#include <stdio.h>
 
 void msginit(message* msg, int length){
     int i;
 
-    //Allocating memory for the string
+    //Allocating the string
     msg->text = (char*) malloc(length * sizeof(char));
 
     //Setting the length
     msg->len = length;
 
-    //Setting all characters to null
+    //Setting all data to null
     for (i = 0; i < msg->len; i++) {
         msg->text[i] = '\0';
+    }
+    for (i = 0; i < 6; i++){
+        msg->date[i] = 0;
     }
 
     return;
 }
 
 void msgend(message* msg){
+    int i = 0;
+
+    /*Deallocating the string*/
     free(msg->text);
+
+    /*Setting all un-destructable parameters to null*/
     msg->len = 0;
+    for (i = 0; i < 6; i++){
+        msg->date[i] = 0;
+    }
 }
 
 void msgclear(message* msg) {
     int i;
 
-    //Setting all the valid characters to null
+    //Setting all the valid data to null
     for (i = 0; msg->text[i] != '\0'; i++) {
         msg->text[i] = '\0';
     }
+
+    for (i = 0; i < 6; i++){
+        msg->date[i] = 0;
+    }
+
     return;
 }
 
@@ -50,6 +68,17 @@ void msgset(message* copy, const char* original) {
     return;
 }
 
+void msgsetdate(message* msg, int* newDate){
+    int i;
+    
+    //Copies all the integrals from "newData" to "msg->data"
+    for (i = 0; i < 6; i++){
+        msg->date[i] = newDate[i];
+    }
+
+    return;
+}
+
 void msgcpy(message* copy, message* original) {
     int i;
 
@@ -59,6 +88,11 @@ void msgcpy(message* copy, message* original) {
     for (i = 0; i < (copy->len- 1) && original->text[i] != '\0'; i++) {
         copy->text[i] = original->text[i];
     }
+
+    for (i = 0; i < 6; i++){
+        copy->date[i] = original->date[i];
+    }
+    
     return;
 }
 
@@ -179,5 +213,69 @@ int msgcomp(message* msg0, message* msg1){
             }
         }
         return 1;
+    }
+}
+
+
+//--------------------------------------
+
+
+void loginit(messagelog* log, int loglen, int msglen){
+    int i;
+
+    /*Allocating the log*/
+    log->msgs = (message*) malloc(loglen * sizeof(message));
+    
+    /*Allocating the messages*/
+    for (i = 0; i < loglen; i++){
+        msginit(&log->msgs[i], msglen);
+    }
+    
+    /*Setting the length*/
+    log->len = loglen;
+
+    return;
+}
+
+void logend(messagelog* log){
+    int i;
+
+    /*Deallocating the messages*/
+    for (i = 0; i < log->len; i++){
+        msgend(&log->msgs[i]);
+    }
+
+    /*Deallocating the log*/
+    free(log->msgs);
+
+    /*Setting up all non-destructible variables to null*/
+    log->len = 0;
+    return;
+}
+
+void logclear(messagelog* log){
+    int i;
+    for (i = 0; i < log->len; i++){
+        msgclear(&log->msgs[i]);
+    }
+    return;
+}
+
+int loglen(messagelog* log){
+    int i;
+    for (i = 0; i < log->len; i++){
+        if (msglen(&log->msgs[i]) == 0) break;
+    }
+    return i;
+}
+
+void logcpy(messagelog* copy, messagelog* original){
+    int i;
+    int oriLen = loglen(original);
+
+    logclear(copy);
+
+    for (i = 0; i < copy->len && i < oriLen; i++){
+        msgcpy(&copy->msgs[i], &original->msgs[i]);
     }
 }

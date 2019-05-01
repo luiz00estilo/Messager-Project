@@ -1,8 +1,27 @@
+#include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "message.h"
 #include "server.h"
 
 int main(){
+
+	while (1){
+		int i, j, k;
+		messagelog log0 ,log1;
+
+		while (1){
+			loginit(&log0, 6, 100);
+			loginit(&log1, 10, 100);
+
+			
+
+			scanf("%i", &i);
+
+			logend(&log0);
+			logend(&log1);
+		}
+	}
 
     int ret;
 	int tamMsg;
@@ -28,6 +47,4 @@ int main(){
 	}
 
 	return 0;
-    
-    return 0;
 }
