@@ -1,10 +1,20 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H
 
+#include <stdio.h>
+
 /*Notas:
-- O manuseamento de memória da mensagem é manual, então não se esqueça de alocar antes de usar (msginit), 
-e desalocar quando terminar (msgend)
-- O texto da mensagem (message.text) sempre termina com um caractere null ('\0')*/
+- O manuseamento de memória da mensagem é manual, então não se esqueça de alocar antes de usar (msginit() e loginit()), 
+e desalocar quando terminar (msgend() e logend())
+- O texto da mensagem (message.text) sempre termina com um caractere null ('\0')
+*/
+
+/*As definições a seguir definem o tamanho de "message.sender" e "message.date", respectivamente.
+Estas podem ser modificadas à sua necesidade*/
+
+#define MSG_SENDER_LEN 20
+#define MSG_DATE_LEN 6
+
 
 typedef struct{
     //Guarda os caracteres da mensagem
@@ -13,31 +23,25 @@ typedef struct{
     int len;
     //Guarda o nome de quem enviou a mensagem
     //--FALTA DEFINIR O TAMANHO, INICIALIZAÇÃO E DESTRUIÇÃO--
-    char* sender;
+    char sender[MSG_SENDER_LEN];
     /*Guarda a uma data no formato aaaa/mm/dd/hh/mm/ss*/
-    int date[6];
+    int date[MSG_DATE_LEN];
 } message;
 
-/*Aloca a mensagem "msg", com capacidade "length" (em caracteres)
---PARA DEFINIR A INICIALIZAÇÃO DE "msg.sender"--*/
+/*Aloca a mensagem "msg", com capacidade "length" (em caracteres)*/
 void msginit(message* msg, int length);
 
 /*Desaloca a mensagem "msg"*/
 void msgend(message* msg);
 
-/*Limpa todos os dados da mensagem
---FALTA DEFINIT A LIMPEZA DE "msg.sender"--*/
+/*Limpa todos os dados da mensagem*/
 void msgclear(message* msg);
 
 /*Retorna a quantidade de caracteres válidos em "msg*/
 int msglen(message* msg);
 
 /*Guarda a string escrita em "original" para "copy"*/
-void msgset(message* copy, const char* original);
-
-/*Guarda a array de números em "msg->data"*/
-void msgsetdate(message* msg, int* newDate);
-/*Comportamento inesperado quando o array "newData" é menor que 6*/
+void msgset(message* msg, char* text, char* sender, int* date);
 
 /*Copia o texto de "original" para "copy"*/
 void msgcpy(message* copy, message* original);
@@ -64,6 +68,7 @@ void msginc(message* msg, char c);
 
 /*Compara todos os caracteres de "msg0" aos de "msg1", se todos forem iguais retorna 1, caso contrário, retorna 0*/
 int msgcomp(message* msg0, message* msg1);
+/*COMPARANDO APENAS OS TEXTOS, IGNORANDO "msg.date" E "msg.sender"*/
 
 
 
@@ -95,6 +100,10 @@ int loglen(messagelog* log);
 /*Copies the data from "original" to "copy"*/
 void logcpy(messagelog* copy, messagelog* original);
 
+/*Guarda os dados de "log" no arquivo "file"
+NÃO GUARDA "log.date" POR ENQUANTO, VALORES NÃO CHAR*/   
+void logfwrite(messagelog* log, FILE* file);
+/*- Requer que "fopen()" seja chamado antes do uso de "file"*/
 
 
 

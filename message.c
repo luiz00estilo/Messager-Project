@@ -1,12 +1,11 @@
 #include "message.h"
 
 #include <stdlib.h>
-#include <stdio.h>
 
 void msginit(message* msg, int length){
     int i;
 
-    //Allocating the string
+    //Allocating the variables
     msg->text = (char*) malloc(length * sizeof(char));
 
     //Setting the length
@@ -16,7 +15,10 @@ void msginit(message* msg, int length){
     for (i = 0; i < msg->len; i++) {
         msg->text[i] = '\0';
     }
-    for (i = 0; i < 6; i++){
+    for (i = 0; i < MSG_SENDER_LEN; i++) {
+        msg->sender[i] = '\0';
+    }
+    for (i = 0; i < MSG_DATE_LEN; i++){
         msg->date[i] = 0;
     }
 
@@ -29,11 +31,6 @@ void msgend(message* msg){
     /*Deallocating the string*/
     free(msg->text);
 
-    /*Setting all un-destructable parameters to null*/
-    msg->len = 0;
-    for (i = 0; i < 6; i++){
-        msg->date[i] = 0;
-    }
 }
 
 void msgclear(message* msg) {
@@ -44,8 +41,12 @@ void msgclear(message* msg) {
         msg->text[i] = '\0';
     }
 
-    for (i = 0; i < 6; i++){
+    for (i = 0; i < MSG_DATE_LEN; i++){
         msg->date[i] = 0;
+    }
+
+    for (i = 0; i < MSG_SENDER_LEN; i++){
+        msg->sender[i] = '\0';
     }
 
     return;
@@ -57,25 +58,22 @@ int msglen(message* msg){
     return i;
 }
 
-void msgset(message* copy, const char* original) {
+void msgset(message* msg, char* text, char* sender, int* date) {
     int i;
-    msgclear(copy);
+    msgclear(msg);
 
     //Copies all the characters, leaving only the last '\0'
-    for (i = 0; i < (copy->len - 1) && original[i] != '\0'; i++){
-        copy->text[i] = original[i];
-    }
-    return;
-}
-
-void msgsetdate(message* msg, int* newDate){
-    int i;
-    
-    //Copies all the integrals from "newData" to "msg->data"
-    for (i = 0; i < 6; i++){
-        msg->date[i] = newDate[i];
+    for (i = 0; i < (msg->len - 1) && text[i] != '\0'; i++){
+        msg->text[i] = text[i];
     }
 
+    for (i = 0; i < (MSG_SENDER_LEN - 1) && sender[i] != '\0'; i++){
+        msg->sender[i] = sender[i];
+    }
+
+    for (i = 0; i < MSG_DATE_LEN; i++){
+        msg->date[i] = date[i];
+    }
     return;
 }
 
@@ -89,8 +87,12 @@ void msgcpy(message* copy, message* original) {
         copy->text[i] = original->text[i];
     }
 
-    for (i = 0; i < 6; i++){
+    for (i = 0; i < MSG_DATE_LEN; i++){
         copy->date[i] = original->date[i];
+    }
+
+    for (i = 0; i < MSG_SENDER_LEN; i++){
+        copy->sender[i] = original->sender[i];
     }
     
     return;
@@ -247,9 +249,6 @@ void logend(messagelog* log){
 
     /*Deallocating the log*/
     free(log->msgs);
-
-    /*Setting up all non-destructible variables to null*/
-    log->len = 0;
     return;
 }
 
@@ -278,4 +277,27 @@ void logcpy(messagelog* copy, messagelog* original){
     for (i = 0; i < copy->len && i < oriLen; i++){
         msgcpy(&copy->msgs[i], &original->msgs[i]);
     }
+}
+
+//Not declared in "message.h"
+int msgsenderlen(message* msg){
+    int i;
+    for (i = 0; msg->sender[i] != '\0'; i++);
+    return i;
+}
+//---------------------------
+
+void logfwrite(messagelog* log, FILE* file){
+    int i;
+    int llen = loglen(log);
+
+    for (i = 0; i < llen; i++){
+        fwrite(log->msgs[i].sender, sizeof(char), msgsenderlen(&log->msgs[i]), file);
+        fwrite("\n", sizeof(char), 1, file);
+        //fwrite(log->msgs[i].date, sizeof(int), MSG_DATE_LEN, file);
+        fwrite("\n", sizeof(char), 1, file);
+        fwrite(log->msgs[i].text, sizeof(char), msglen(&log->msgs[i]), file);
+        fwrite("\n", sizeof(char), 1, file);
+    }
+    return;
 }

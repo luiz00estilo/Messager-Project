@@ -8,15 +8,33 @@ int main(){
 
 	while (1){
 		int i, j, k;
+		int date[6] = {1,2,3,4,5,6};
 		messagelog log0 ,log1;
+		FILE* ftest;
 
 		while (1){
-			loginit(&log0, 6, 100);
+			loginit(&log0, 6, 10);
 			loginit(&log1, 10, 100);
 
-			
+			msgset(&log0.msgs[0], "This is the first line", "201.461.823", date);
+			msgset(&log0.msgs[1], "Then the second one", "202.472.382", date);
+			msgset(&log0.msgs[2], "This is the third", "203.524.639", date);
+			msgset(&log0.msgs[3], "And this is the last one", "204.576.012", date);
 
-			scanf("%i", &i);
+    	    ftest = fopen("test file", "w+");
+			//fseek(ftest, 0, SEEK_END);
+        	logfwrite(&log0, ftest);
+			/*for (i = 0; i < 5; i++){
+				for (j = 0; j < 4; j++){
+					fwrite(log0.msgs[j].text, sizeof(char), msglen(&log0.msgs[j]), ftest);
+					fwrite("\n", sizeof(char), 1, ftest);
+				}
+        	}*/
+        	//fseek(ftest, msglen(&msg), SEEK_SET);
+
+        	fclose(ftest);
+
+        	scanf("%i", &i);
 
 			logend(&log0);
 			logend(&log1);
