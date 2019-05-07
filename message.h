@@ -40,8 +40,14 @@ void msgclear(message* msg);
 /*Retorna a quantidade de caracteres válidos em "msg*/
 int msglen(message* msg);
 
-/*Guarda a string escrita em "original" para "copy"*/
-void msgset(message* msg, char* text, char* sender, int* date);
+/*Guarda o texto em "text" em "msg->text"*/
+void msgsetstr(message* msg, char* text);
+
+/*Guarda a data em "date" em "msg->date"*/
+void msgsetdate(message* msg, int* date);
+
+/*Guarda o ip em "sender" em "msg->sender"*/
+void msgsetsender(message* msg, char* sender);
 
 /*Copia o texto de "original" para "copy"*/
 void msgcpy(message* copy, message* original);
@@ -105,7 +111,8 @@ NÃO GUARDA "log.date" POR ENQUANTO, VALORES NÃO CHAR*/
 void logfwrite(messagelog* log, FILE* file);
 /*- Requer que "fopen()" seja chamado antes do uso de "file"*/
 
-
-
+/*Lê os dados guardados por "logfwrite()" no arquivo "file" e os guarda em "log"*/
+void logfread(messagelog* log, FILE* file);
+/*- Requer que "fopen()" seja chamado antes do uso de "file"*/
 
 #endif

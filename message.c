@@ -36,17 +36,19 @@ void msgend(message* msg){
 void msgclear(message* msg) {
     int i;
 
-    //Setting all the valid data to null
+    //Clearing "msg->text"
     for (i = 0; msg->text[i] != '\0'; i++) {
         msg->text[i] = '\0';
     }
 
-    for (i = 0; i < MSG_DATE_LEN; i++){
-        msg->date[i] = 0;
-    }
-
+    //Clearing "msg->sender"
     for (i = 0; i < MSG_SENDER_LEN; i++){
         msg->sender[i] = '\0';
+    }
+
+    //Clearing "msg->date"
+    for (i = 0; i < MSG_DATE_LEN; i++){
+        msg->date[i] = 0;
     }
 
     return;
@@ -58,23 +60,49 @@ int msglen(message* msg){
     return i;
 }
 
-void msgset(message* msg, char* text, char* sender, int* date) {
+void msgsetstr(message* msg, char* text) {
     int i;
-    msgclear(msg);
+    
+    //Clearing "msg->text"
+    for (i = 0; msg->text[i] != '\0'; i++) {
+        msg->text[i] = '\0';
+    }
 
-    //Copies all the characters, leaving only the last '\0'
+    //Copying from "text" to "msg->text"
     for (i = 0; i < (msg->len - 1) && text[i] != '\0'; i++){
         msg->text[i] = text[i];
     }
 
+    return;
+}
+
+void msgsetdate(message* msg, int* date){
+    int i;
+
+    //Clearing "msg->date"
+    for (i = 0; i < MSG_DATE_LEN; i++){
+        msg->date[i] = 0;
+    }
+
+    //Copying from "date" to "msg->date"
+    for (i = 0; i < MSG_DATE_LEN; i++){
+        msg->date[i] = date[i];
+    }
+}
+
+void msgsetsender(message* msg, char* sender){
+    int i;
+
+    //Clearing "msg->sender"
+    for (i = 0; i < MSG_SENDER_LEN; i++){
+        msg->sender[i] = '\0';
+    }
+
+    //Copying from "sender" to "msg->sender"
     for (i = 0; i < (MSG_SENDER_LEN - 1) && sender[i] != '\0'; i++){
         msg->sender[i] = sender[i];
     }
 
-    for (i = 0; i < MSG_DATE_LEN; i++){
-        msg->date[i] = date[i];
-    }
-    return;
 }
 
 void msgcpy(message* copy, message* original) {
@@ -290,14 +318,55 @@ int msgsenderlen(message* msg){
 void logfwrite(messagelog* log, FILE* file){
     int i;
     int llen = loglen(log);
+    int eol = -1;
 
     for (i = 0; i < llen; i++){
+        //Writing ip
         fwrite(log->msgs[i].sender, sizeof(char), msgsenderlen(&log->msgs[i]), file);
         fwrite("\n", sizeof(char), 1, file);
-        //fwrite(log->msgs[i].date, sizeof(int), MSG_DATE_LEN, file);
-        fwrite("\n", sizeof(char), 1, file);
+
+        //Writing date (the date ends in (int)-1 instead of a '\n')
+        fwrite(log->msgs[i].date, sizeof(int), MSG_DATE_LEN, file);
+        fwrite(&eol, sizeof(int), 1, file);
+
+        //Writing text
         fwrite(log->msgs[i].text, sizeof(char), msglen(&log->msgs[i]), file);
         fwrite("\n", sizeof(char), 1, file);
+    }
+    return;
+}
+
+void logfread(messagelog* log, FILE* file){
+    int i, j;
+    char dummyC;
+    int dummyI;
+
+    logclear(log);
+
+    //For all msgs
+    for (i = 0; i < log->len && !feof(file); i++){
+        //printf("%i\n", i);
+        //Copy ip to "log->msg[i].sender"
+        for (j = 0; fread(&dummyC, sizeof(char), 1, file) == 1
+        && dummyC != '\n'
+        && j < MSG_SENDER_LEN; j++){
+            log->msgs[i].sender[j] = dummyC;
+        }
+
+        //Copy date to "log->msg[i].date"
+        for (j = 0; fread(&dummyI, sizeof(int), 1, file) == 1
+        && dummyI != -1
+        && j < MSG_DATE_LEN; j++){
+            log->msgs[i].date[j] = dummyI;
+        }
+
+        //Copy ip to "log->msg[i].sender"
+        for (j = 0; fread(&dummyC, sizeof(char), 1, file) == 1
+        && dummyC != '\n'
+        && j < log->msgs[i].len; j++){
+            log->msgs[i].text[j] = dummyC;
+        }
+
     }
     return;
 }
