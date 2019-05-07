@@ -10,7 +10,7 @@
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}",
                 "${workspaceFolder}/message.c",
-                "${workspaceFolder}/client.c",
+                "${workspaceFolder}/server.c",
                 //"${workspaceFolder}/mlog.c"
             ],
             "options": {
