@@ -5,6 +5,7 @@
 #include "server.h"
 
 int main(){
+
     int ret;
 	int tamMsg;
 	char msgEnv[TAM_MAX];
