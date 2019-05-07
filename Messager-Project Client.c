@@ -2,19 +2,23 @@
 #include <stdio.h>
 #include <string.h>
 #include "message.h"
-#include "server.h"
+#include "client.h"
 
 int main(){
-    int ret;
+	int ret;
 	int tamMsg;
 	char msgEnv[TAM_MAX];
 	char msgRec[TAM_MAX];
 
-	/* Espera o cliente pedir para se conectar e se conecta */
-	ret	= conecta();
+	/* Pede para se conectar no servidor */
+	ret	= conecta("127.0.0.1");
 	while (ret != -1){
 		
-		/* Lê uma mensagem do usuário e envia pela rede*/
+		/* Recebe uma mensagem do servidor pela rede */
+		ret = recebeMensagem(msgRec, TAM_MAX);
+		printf("Msg recebida: %s \n", msgRec);
+	
+		/* Lê uma mensagem do usuário e envia pela rede para o servidor*/
 		printf("Digite a mensagem para enviar: ");
 		fgets(msgEnv, TAM_MAX, stdin);
 		tamMsg = strlen(msgEnv); 
@@ -22,10 +26,6 @@ int main(){
 		ret = enviaMensagem(msgEnv, tamMsg);
 		printf("Enviou uma mensagem com %d bytes\n", ret);
 
-
-		/* Recebe uma mensagem pela rede */
-		ret = recebeMensagem(msgRec, TAM_MAX);
-		printf("Msg recebida: %s \n", msgRec);
 	}
 
 	return 0;

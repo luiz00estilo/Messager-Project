@@ -6,11 +6,11 @@
             "command": "/usr/bin/gcc",
             "args": [
                 "-g",
-                "${workspaceFolder}/Messager-Project Server.c",
+                "${workspaceFolder}/Messager-Project Client.c",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}",
                 "${workspaceFolder}/message.c",
-                "${workspaceFolder}/server.c",
+                "${workspaceFolder}/client.c",
                 //"${workspaceFolder}/mlog.c"
             ],
             "options": {
